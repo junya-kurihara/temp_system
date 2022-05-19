@@ -1,12 +1,19 @@
 import datetime
 import random
+import os
+import configparser
 
 import sqlalchemy
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
 
 
-engine = sqlalchemy.create_engine('sqlite:///db/test_sqlite.db')
+config_ini = configparser.ConfigParser()
+config_ini.read('config/config.ini')
+config = config_ini['database']
+db_file_path = config.get('file_path')
+
+engine = sqlalchemy.create_engine('sqlite:///' + db_file_path )
 
 Base = sqlalchemy.ext.declarative.declarative_base()
 
