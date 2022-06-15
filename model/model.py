@@ -13,9 +13,9 @@ class Temper(Base):
     __tablename__ = 'temper'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    created_at = sqlalchemy.Column(sqlalchemy.DateTime)
-    updated_at = sqlalchemy.Column(sqlalchemy.DateTime)
-    value = sqlalchemy.Column(sqlalchemy.Float)
+    created_at = sqlalchemy.Column(sqlalchemy.String)
+    updated_at = sqlalchemy.Column(sqlalchemy.String)
+    value = sqlalchemy.Column(sqlalchemy.String)
 
 
 class BaseEngine(object):
