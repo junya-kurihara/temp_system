@@ -9,7 +9,8 @@ from model.model import BaseEngine
 
 def get_temper():
     # test function
-    return random.uniform(10, 30)
+    temp = random.uniform(10, 30)
+    return f'{temp:.2f}'
 
 def main():
     script_dir = os.getcwd()
@@ -24,28 +25,36 @@ def main():
     db_file_name = config_ini['database'].get('file_name')
     db_file = db_dir + db_file_name
 
+    # data config
+    data_dir = script_dir + '/data/'
+    data_file_name = config_ini['data'].get('file_name')
+    data_file = data_dir + data_file_name
+
     # key string
     key = config_ini['key'].get('key')
 
     # get temp value
     temp_value = get_temper()
-    temp_str = str(temp_value)
-
-    # encrypt and decrypt
-    encrypted = AES256.b64encrypt(key, temp_str)
-    decrypted = AES256.b64decrypt(key, encrypted)
-
-    print(temp_value)
-    print(temp_str)
-    print(encrypted)
-    print(decrypted)
 
     now = datetime.datetime.now()
+    now = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    row = now + ' ' + temp_value
+
+    # encrypt and decrypt
+    encrypted = AES256.b64encrypt(key, row)
+    decrypted = AES256.b64decrypt(key, encrypted)
+
+    with open(data_file, 'w') as f:
+        f.write(encrypted)
 
     db = BaseEngine(db_file)
     db.temp_create_db()
     db.write_db(now, now, temp_value)
     db.select_db()
+
+    print(row)
+    print(decrypted)
 
 
 if __name__ == '__main__':
