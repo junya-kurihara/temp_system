@@ -1,55 +1,53 @@
 import datetime
 import random
-import string
 import os
-#import configparser
-from crypt import AESCipher
+import configparser
 
-from model.model import Migration, Crud
+import AES256
+from model.model import BaseEngine
 
-
-#config_ini = configparser.ConfigParser()
-#config_ini.read('config/config.ini')
-#config = config_ini['database']
-#db_file_path = config.get('file_path')
-
-key = ''.join([random.choice(string.ascii_letters + string.digits) for i in range(32)])  # -> '4yKxQ5hMcUJixcG4Z8Lc5ZPBr5McS65X'
 
 def get_temper():
-    temp_value = random.uniform(10, 30)
-    return temp_value
+    # test function
+    return random.uniform(10, 30)
 
-def encrypt_temper(temp_value: str):
-    cipher = AESCipher(key)
-    encrypted = cipher.encrypt(temp_value)
-    return encrypted 
+def main():
+    script_dir = os.getcwd()
 
-def decrypt_temper(encrypted: str):
-    cipher = AESCipher(key)
-    decrypted = cipher.decrypt(encrypted)
-    return decrypted
+    # config read
+    config_ini = configparser.ConfigParser()
+    config_dir = script_dir + '/config/'
+    config_ini.read(config_dir + 'config.ini')
 
-if __name__ == '__main__':
+    # db config
+    db_dir = script_dir + '/db/'
+    db_file_name = config_ini['database'].get('file_name')
+    db_file = db_dir + db_file_name
 
-    now = datetime.datetime.now()
+    # key string
+    key = config_ini['key'].get('key')
 
+    # get temp value
     temp_value = get_temper()
     temp_str = str(temp_value)
 
-    encrypted = encrypt_temper(temp_str)
-    decrypted = decrypt_temper(encrypted)
+    # encrypt and decrypt
+    encrypted = AES256.b64encrypt(key, temp_str)
+    decrypted = AES256.b64decrypt(key, encrypted)
 
-    mg = Migration()
-    dbcon = Crud()
+    print(temp_value)
+    print(temp_str)
+    print(encrypted)
+    print(decrypted)
 
-    mg.temp_create_db()
+    now = datetime.datetime.now()
 
-    #print(temp_value)
-    #print(temp_str)
-    #print(encrypted)
-    #print(decrypted)
+    db = BaseEngine(db_file)
+    db.temp_create_db()
+    db.write_db(now, now, temp_value)
+    db.select_db()
 
-    dbcon.write_db(now, now, encrypted)
 
-    dbcon.select_db()
-    
+if __name__ == '__main__':
+    main()
+
