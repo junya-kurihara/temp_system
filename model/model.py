@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 
 import sqlalchemy
 import sqlalchemy.ext.declarative
@@ -18,8 +19,22 @@ class Temper(Base):
     value = sqlalchemy.Column(sqlalchemy.String)
 
 
-class BaseEngine(object):
-    def __init__(self, path):
+class Model(object):
+
+    def get_temperature(self):
+        # test function
+        temp = random.uniform(10, 30)
+        return f'{temp:.2f}'
+    
+    def get_exec_datetime(self):
+        now = datetime.datetime.now()
+        now = now.strftime('%Y-%m-%d %H:%M:%S')
+        return now
+    
+    def get_init_info(self):
+        print('init_info')
+
+    def init_db(self, path):
         self.engine = sqlalchemy.create_engine('sqlite:///' + path)
 
         Session = sessionmaker(bind=self.engine)
@@ -28,7 +43,7 @@ class BaseEngine(object):
     def temp_create_db(self):
         Base.metadata.create_all(self.engine)
 
-    def write_db(self, created_at, updated_at, temp_value):
+    def insert_temper_db(self, created_at, updated_at, temp_value):
         temper = Temper(
             created_at=created_at,
             updated_at=updated_at,
@@ -38,7 +53,7 @@ class BaseEngine(object):
         self.session.commit()
 
     def select_db(self):
-        temper_records = self.session.query(Temper).all()
+        temper_records = self.session.query(Temper).order_by(Temper.id.desc()).limit(10)
         for temp in temper_records:
             print(
                     temp.id,
@@ -46,53 +61,17 @@ class BaseEngine(object):
                     temp.updated_at,
                     temp.value
                  )
-        
 
-# class BaseSession(BaseEngine):
-#     def __init__(self):
-#         super().__init__()
-#         Session = sessionmaker(bind=self.engine)
-#         self.session = Session()
-#
-#
-# class Migration(object):
-#     def __init__(self, path):
-#         self.e = BaseEngine(path).engine
-#
-#     def temp_create_db(self):
-#         Base.metadata.create_all(self.e)
-#
-#
-# class Crud(BaseSession):
-#     def __init__(self):
-#         super().__init__()
-#
-#     def write_db(self, created_at, updated_at, temp_value):
-#
-#         temper = Temper(
-#                 created_at = created_at,
-#                 updated_at = updated_at,
-#                 value = temp_value
-#                 )
-#         self.session.add(temper)
-#         self.session.commit()
-#
-#     def select_db(self):
-#         temper_records = self.session.query(Temper).all()
-#         for temp in temper_records:
-#             print(
-#                     temp.id,
-#                     temp.created_at,
-#                     temp.updated_at,
-#                     temp.value
-#                  )
-    
 
 if __name__ == '__main__':
-    now = datetime.datetime.now()
-    db_file = os.getcwd() + '/temp_test.db'
-    be = BaseEngine(db_file)
-    be.temp_create_db()
-    be.write_db(now, now, 10.5)
-    be.write_db(now, now, 12.6)
-    be.select_db()
+    model = Model()
+
+    date = model.get_exec_datetime()
+    temp = model.get_temperature()
+    print(temp)
+#    db_file = os.getcwd() + '/db/temp_test.db'
+#
+#    model.init_db(db_file)
+#    model.temp_create_db()
+#    model.insert_temper_db(date, date, 10.5)
+#    model.select_db()
