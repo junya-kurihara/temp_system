@@ -5,6 +5,11 @@ def save_encrypted_file(encrypted, save_path):
     with open(save_path, 'w') as f:
         f.write(encrypted)
 
+
+class View(object):
+    pass
+
+
 if __name__ == '__main__':
     sep_str = os.sep
     current_path = os.getcwd()
