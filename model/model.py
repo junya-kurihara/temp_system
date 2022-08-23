@@ -21,6 +21,11 @@ class Temper(Base):
 
 class Model(object):
 
+    def __init__(self):
+        self.engine = None
+        self.session = None
+
+    #
     def get_temperature(self):
         # test function
         temp = random.uniform(10, 30)
@@ -68,10 +73,10 @@ if __name__ == '__main__':
 
     date = model.get_exec_datetime()
     temp = model.get_temperature()
-    print(temp)
-#    db_file = os.getcwd() + '/db/temp_test.db'
-#
-#    model.init_db(db_file)
-#    model.temp_create_db()
-#    model.insert_temper_db(date, date, 10.5)
-#    model.select_db()
+    sep = os.sep
+    db_file = os.getcwd() + sep + 'db' + sep + 'temp_test.db'
+
+    model.init_db(db_file)
+    model.temp_create_db()
+    model.insert_temper_db(date, date, temp)
+    model.select_db()
